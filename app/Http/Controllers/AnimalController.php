@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Animal;
+use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-
+use Illuminate\Support\Facades\Cache;
 class AnimalController extends Controller
 {
     /**
@@ -13,10 +14,45 @@ class AnimalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $animals = Animal::get();
-        return response(['data' => $animals], Response::HTTP_OK);
+        $url = $request->url;
+        $queryParams = $request->query();
+        ksort($queryParams);
+        $queryString = http_build_query($queryParams);
+        $fullUrl = "{$url}?{$queryString}";
+        if (Cache::has($fullUrl)) {
+            return Cache::get($fullUrl);
+        }
+
+        //Setting 
+        $limit = $request->limit ?? 10;
+        $query = Animal::query();
+        //filters
+        if (isset($request->filters)) {
+            $filters = explode(',' , $request->filters);
+            foreach($filters as $key => $filter) {
+                list($key, $value) = explode(':' , $filter);
+                $query->where($key, 'like', '%$value%');
+            }
+        }
+        //sorts
+        if (isset($request->sorts)) {
+            $sorts = explode(',', $request->sorts);
+            foreach($sorts as $key => $sort) {
+                list($key, $value) = explode(':' , $sort);
+                if ($sort == 'asc' || $sort == 'desc') {
+                    $query->orderBy($key, $value);
+                }
+            }
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+
+        $animals = Animal::paginate($limit)->appends($request->query());
+        return Cache::remember($fullUrl, 60, function() use ($animals) {
+            return response($animals, Response::HTTP_OK);
+        });
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-
+use App\Models\Animal;
+use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -13,6 +15,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        //Clear db
+        Schema::disableForeignKeyConstraints();
+        Animal::truncate();
+        User::truncate();
+
+        //Create data
+        User::factory(5)->create();
+        Animal::factory(2000)->create();
+        Schema::enableForeignKeyConstraints();
     }
 }
