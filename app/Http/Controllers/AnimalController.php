@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Animal;
-use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
@@ -56,16 +55,6 @@ class AnimalController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -96,17 +85,6 @@ class AnimalController extends Controller
     public function show(Animal $animal)
     {
         return response($animal, Response::HTTP_OK);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Animal  $animal
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Animal $animal)
-    {
-        //
     }
 
     /**
