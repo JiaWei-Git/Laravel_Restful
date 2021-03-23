@@ -12,4 +12,8 @@ class Type extends Model
         'name',
         'sort'
     ];
+
+    public function animals() {
+        return $this->hashMany('App\Models\Animal', 'type_id', 'id');
+    }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AnimalCollection;
 use App\Models\Animal;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Resources\AnimalResource;
 class AnimalController extends Controller
 {
     /**
@@ -26,7 +28,7 @@ class AnimalController extends Controller
 
         //Setting 
         $limit = $request->limit ?? 10;
-        $query = Animal::query();
+        $query = Animal::query()->with('type');
         //filters
         if (isset($request->filters)) {
             $filters = explode(',' , $request->filters);
@@ -50,7 +52,7 @@ class AnimalController extends Controller
 
         $animals = Animal::paginate($limit)->appends($request->query());
         return Cache::remember($fullUrl, 60, function() use ($animals) {
-            return response($animals, Response::HTTP_OK);
+            return new AnimalCollection($animals);
         });
     }
 
@@ -84,7 +86,8 @@ class AnimalController extends Controller
      */
     public function show(Animal $animal)
     {
-        return response($animal, Response::HTTP_OK);
+        return new AnimalResource($animal);
+        //return response($animal, Response::HTTP_OK);
     }
 
     /**
