@@ -65,7 +65,7 @@ class AnimalController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'type_id' => 'nullable|integer',
+            'type_id' => 'nullable|exists:types,id',
             'name' => 'required|string|max:255',
             'birthday' => 'nullable|date',
             'area' => 'nullable|string|max:255',
@@ -87,7 +87,6 @@ class AnimalController extends Controller
     public function show(Animal $animal)
     {
         return new AnimalResource($animal);
-        //return response($animal, Response::HTTP_OK);
     }
 
     /**
@@ -101,7 +100,7 @@ class AnimalController extends Controller
     {
         
         $this->validate($request,[
-            'type_id' => 'nullable|integer',
+            'type_id' => 'nullable|exists:types,id',
             'name' => 'string|max:255',
             'birthday' => 'nullable|date',
             'area' => 'nullable|string|max:255',

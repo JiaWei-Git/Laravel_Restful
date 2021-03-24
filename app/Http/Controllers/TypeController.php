@@ -6,6 +6,7 @@ use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Resources\TypeResource;
 class TypeController extends Controller
 {
     /*
@@ -40,7 +41,8 @@ class TypeController extends Controller
             $request['sort'] = $max + 1;
         }
         $type = Type::create($request->all());
-        return response(['data' => $type],Response::HTTP_CREATED);
+        return new TypeResource($type);
+        //return response(['data' => $type],Response::HTTP_CREATED);
     }
 
     /**
@@ -51,7 +53,7 @@ class TypeController extends Controller
      */
     public function show(Type $type)
     {
-        return response(['data' => $type], Response::HTTP_OK);
+        return new TypeResource($type);
     }
 
     /**
@@ -73,7 +75,7 @@ class TypeController extends Controller
 
         $type->update($request->all());
 
-        return response(['data' => $type], Response::HTTP_OK);
+        return new TypeResource($type);
     }
 
     /**
