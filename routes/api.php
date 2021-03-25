@@ -15,7 +15,7 @@ use App\Http\Controllers\TypeController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware(['auth:api', 'scope:user-info'])->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::apiResource('animals', AnimalController::class);

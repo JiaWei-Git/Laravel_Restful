@@ -6,6 +6,9 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 use App\Traits\ApiResponseTrait;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Laravel\Passport\Exceptions\MissingScopeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -57,7 +60,23 @@ class Handler extends ExceptionHandler
             if ($exception instanceof MethodNotAllowedHttpException) {
                 return $this->errorResponse($exception->getMessage(), Response::HTTP_METHOD_NOT_ALLOWED);
             }
+
+            if ($exception instanceof AuthorizationException) {
+                return $this->errorResponse($exception->getMessage(), Response::HTTP_UNAUTHORIZED);
+            }
+
+            if ($exception instanceof MissingScopeException) {
+                return $this->errorResponse($exception->getMessage(), Response::HTTP_FORBIDDEN);
+            }
         }
         return parent::render($requese, $exception);
+    }
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return $this->errorResponse($exception->getMessage(), Response::HTTP_UNAUTHORIZED);
+        } else {
+            return redirect()->guest($exception->redirectTo() ?? route('login'));
+        }
     }
 }

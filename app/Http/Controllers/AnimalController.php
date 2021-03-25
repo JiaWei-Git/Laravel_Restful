@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Cache;
 use App\Http\Resources\AnimalResource;
 class AnimalController extends Controller
 {
+    public function __construct() 
+    {
+        $this->middleware('client', ['only' => ['index', 'show']]);
+        $this->middleware('scopes:create-animals', ['only' => ['store']]);
+        $this->middleware('auth:api', ['except' => ['index', 'show']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -110,7 +116,7 @@ class AnimalController extends Controller
         ]);
         
         $animal->update($request->all());
-        return response(null, Response::HTTP_OK);
+        return new AnimalResource($animal);
     }
 
     /**
